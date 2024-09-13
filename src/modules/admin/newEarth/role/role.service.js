@@ -312,14 +312,14 @@ const getPermissions = async (moduleName, req, logger) => {
       const currentUser = await findUserById(req.userId);
       const isCurrentUserSuperAdmin = req.isSuperAdmin;
       const findPermissions =  await roleModel.findPermissionsById(currentUser[0].role);
-      console.log("currentUser--------------------  ",currentUser)
+      console.log("findPermissions--------------------  ",findPermissions)
       console.log("isCurrentUserSuperAdmin---------------  ",isCurrentUserSuperAdmin)
       const adminPermissions =  await roleModel
             .findPermissionsById(currentUser[0].role)
             .then((Cpermissions) =>
               Cpermissions.filter((perm) => perm.is_active === true)
             );
-console.log("adminPermissions----------  ",adminPermissions)
+//console.log("adminPermissions----------  ",adminPermissions)
 
       const permissionList = await permissionModel.list();
     //  console.log("permissionList: ",permissionList.length)
@@ -348,22 +348,31 @@ console.log("adminPermissions----------  ",adminPermissions)
             return;
           }
           const finalArr = newFilter.map((finalObj) => {
-            console.log("finalObj-------------- ",item)
+           // console.log("finalObj-------------- ",item)
             const permissionResult = findPermissions.filter(
               (permissionItem) =>
                 permissionItem.role_id === currentUser[0].role &&
-                permissionItem.permission_id === finalObj.id
+                permissionItem.permission_id === finalObj.id 
+                
             );
-            if (permissionResult && permissionResult.length > 0) {
+            console.log("permissionResult-------------- ",permissionResult)
+
+            if (permissionResult && permissionResult.length > 0 ) {
+              if (permissionResult && Object.keys(permissionResult).length > 0) {
               return {
                 ...finalObj
-              };
-            }
-            return { ...finalObj};
-          });
-          generateArr.push({ name: item.name, data: finalArr });
 
-        
+              };
+             }
+            }
+         //  return { ...finalObj};
+          }).filter(item => item && Object.keys(item).length > 0);
+      //   const cleanedData = finalArr.filter(item => item && Object.keys(item).length > 0);
+
+        //  console.log("cleanedData", cleanedData);
+          generateArr.push({ name: item.name, data: finalArr });
+  
+
             
 
       });

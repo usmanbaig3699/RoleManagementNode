@@ -9,7 +9,6 @@ const fastifySwaggerUI = require('@fastify/swagger-ui');
 const fastifyFormBody = require('@fastify/formbody');
 const fastifyMultipart = require('@fastify/multipart');
 const path = require('path'); // configure path
-const secureAdminRoutes = require("./src/utils/security/secureAdminRoutes"); // using jwtsecuirty
 
 
 require('dotenv').config({
@@ -104,8 +103,6 @@ server.register(fastifySwaggerUI, {
   exposeRoute: true,
 });
 
- // secureAdminRoutes request registered
- secureAdminRoutes.secureAdmin(fastify);
 //  API Cors
 server.register(fastifyCors, {
   origin: '*',

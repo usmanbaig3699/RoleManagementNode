@@ -55,8 +55,12 @@ const getURL = (headers, protocol) => {
 };
 
 function secureAdmin(fastify) {
+
   fastify.addHook('onRequest', async (request, reply) => {
     try {
+      console.log("-----------------hookkkk call---------------",request.url)
+      console.log("-----------------appRouteScheme---------------",appRouteScheme)
+
       // if it is app route
       if (request.url.includes(appRouteScheme)) {
         // For insecure route, put any logic if requires
@@ -64,6 +68,7 @@ function secureAdmin(fastify) {
         const found = insecureRoute.filter((route) =>
           request.url.includes(route)
         );
+        console.log("found-----------",found)
         if (found.length > 0) {
           return;
         }
@@ -86,9 +91,11 @@ function secureAdmin(fastify) {
         const tenant = await getTenant(
           url.hostname.split('.')[process.env.HOST_SPLIT]
         );
+        console.log("tenant----------",tenant)
         const token = await JWTKey(tenant, request.headers.authorization);
         // const token = request.headers.authorization;
         // const token = JWT;
+        console.log("token ",token)
 
         if (!token) {
           // const objResult = apiFailResponse(
@@ -104,22 +111,38 @@ function secureAdmin(fastify) {
           reply.code(HTTP_STATUS.UNAUTHORIZED).send(objResult);
           return;
         }
+
         const verificationResult = await JwtAuth.verifyTokenForAdmin(token);
-        if (!verificationResult.result) {
+        console.log("verificationResult  ",verificationResult.data.role.permissions)
+        if (!verificationResult.result ) {
           reply.code(HTTP_STATUS.UNAUTHORIZED).send({
-            message: verificationResult.message,
+            message: "permission denied!",
             success: false,
             code: HTTP_STATUS.UNAUTHORIZED,
           });
           return;
         }
-
+       
+        const permissionFound = verificationResult.data.role.permissions.filter((route) =>
+          request.url.includes(route.action)
+        );
+        console.log("permissionFound-----------",permissionFound)
+        console.log("request.url-----------",request.url)
+        // if (permissionFound.length <= 0) {
+        //   reply.code(HTTP_STATUS.UNAUTHORIZED).send({
+        //     message: "permission denied!",
+        //     success: false,
+        //     code: HTTP_STATUS.UNAUTHORIZED,
+        //   });
+        //   return;
+        // }
         
         // Set login user to the session request
 
         request.session = verificationResult.data;
       }
     } catch (err) {
+      console.error(err)
       reply.send(err);
     }
   });
