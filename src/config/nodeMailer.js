@@ -12,7 +12,7 @@ const OAuth2 = google.auth.OAuth2;
 const oauth2Client = new OAuth2(
   process.env.MAIL_CLIENT_ID,
   process.env.MAIL_CLIENT_SECRET_ID,
-  'https://developers.google.com/oauthplayground' // Redirect URL
+  process.env.MAIL_REDIRECT_URL // Redirect URL
 );
 
 // Set the refresh token
