@@ -49,6 +49,7 @@ const MODULE = Object.freeze({
   TENANT: 'tenant',
   TENANT_CONFIG: 'tenant_config',
   SHOP_EVENT_HOLIDAYS: 'tenant_event_holidays',
+  CUSTOMER: 'customer',
   VIEW: Object.freeze({
     CART_DETAIL: 'cart_detail_view',
     CART_LIST: 'cart_list_view',

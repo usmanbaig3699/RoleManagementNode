@@ -561,7 +561,9 @@ const profile = async (req, res) => {
 
 const profileUpdate = async (req, res) => {
   logger.verbose(`Handling ${req.method} ${req.url} Route`);
+  console.log("req  ==== ",req.session)
   try {
+   
     const data = await backOfficeUserService.profileUpdate(
       MODULE.BACK_OFFICE_USER,
       req.body,

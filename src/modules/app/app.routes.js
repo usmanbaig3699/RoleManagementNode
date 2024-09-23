@@ -19,6 +19,7 @@ const catItemRoutes = require('./categoriesItem/categoriesItem.routes');
 const storeRoutes = require('./store/store.routes');
 const storeEmployeeRating = require('./appStoreEmployeeRating/appStoreEmployeeRating.routes');
 const newEarthRoutes = require('./newEarth/newEarth.routes');
+const customerRoutes = require('./appCustomer/appCustomer.routes')
 
 const appRoutes = (fastify, options, done) => {
   secureUserAppRoutes.secure(fastify);
@@ -44,7 +45,7 @@ const appRoutes = (fastify, options, done) => {
     prefix: '/store/appointment-ratings',
   });
   fastify.register(newEarthRoutes, { prefix: '/new-earth' });
-
+  fastify.register(customerRoutes, { prefix: '/customer' });
   done();
 };
 

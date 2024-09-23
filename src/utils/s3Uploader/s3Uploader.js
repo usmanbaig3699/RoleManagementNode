@@ -9,8 +9,10 @@ const s3 = new AWS.S3({
 
 const uploadToAdminBucket = (params) => {
   // const data = { ...params, Bucket: process.env.S3_BUCKET, ACL: 'public-read' }; // ACL is not supported on the bucket.
-  const data = { ...params, Bucket: process.env.S3_BUCKET };
+  const data = { ...params, Bucket: process.env.S3_BUCKET , ACL: 'public-read' };
   return s3.upload(data).promise();
 };
+
+
 
 module.exports = { uploadToAdminBucket };

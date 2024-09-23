@@ -145,6 +145,8 @@ const login = async (moduleName, protocol, headers, userData, logger) => {
     );
 
     console.log("systemConfig: ", url.hostname.split('.')[process.env.HOST_SPLIT])
+    console.log("url.hostname : ", url.hostname)
+    console.log("url : ", url)
 
     if (!systemConfig) {
       result.hasError = true;
@@ -737,6 +739,8 @@ const profile = async (moduleName, userId, logger) => {
 };
 
 const profileUpdate = async (moduleName, body, logger) => {
+
+  console.log("body--------------- ",body)
   let newBody = body;
   const file = newBody.avatar;
   delete newBody.avatar;

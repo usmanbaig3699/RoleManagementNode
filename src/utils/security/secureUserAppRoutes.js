@@ -98,10 +98,13 @@ const insecureRoute = [
   'api/v1/app/store/appointment/list',
   'api/v1/app/appointment/service/category/item',
   'api/v1/app/appointment/pay-fast/access-token',
+  'api/v1/app/customer/create',
 ];
 function secure(fastify) {
   fastify.addHook('preValidation', async (request, reply) => {
     try {
+
+     // console.log("customer body ----- ",request.body)
       // if it is app route
       const tenantId = getTenantId(request);
       const { isActive } = await isTenantActive(tenantId).catch((error) =>

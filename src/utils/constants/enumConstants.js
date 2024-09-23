@@ -210,6 +210,10 @@ const ENUM_CONSTANT = Object.freeze({
     APP_USER: 'AppUser',
     EMPLOYEE: 'Employee',
   }),
+  CUSTOMER_STATUS: Object.freeze({
+    VERIFIED: 'verified',
+    UNVERIFIED: 'unverified',
+  }),
 });
 
 module.exports = ENUM_CONSTANT;

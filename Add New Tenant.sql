@@ -98,3 +98,38 @@ VALUES(uuid_generate_v4(), 'Printed Tshirt', 'https://laundry-app.s3.ca-central-
 ,(uuid_generate_v4(), 'Coat', 'https://lundry-app-admin.s3.ca-central-1.amazonaws.com/menu/fc5d9743-341d-4755-9d05-7364e2ae0361-sweater_720.png', 'https://lundry-app-admin.s3.ca-central-1.amazonaws.com/menu/fc5d9743-341d-4755-9d05-7364e2ae0361-sweater_720.png', 'Coats', 12.00, false, (select id from public.home_category hc where "name" = 'Outdoor Wear' and tenant = (Select id from tenant t where "name" = '${tenantName}')), (select id from backoffice_user bu where bu.username = '${shopAdmin}'), (select id from backoffice_user bu where bu.username = '${shopAdmin}'), 1, false)
 ,(uuid_generate_v4(), 'Shirts', 'https://lundry-app-admin.s3.ca-central-1.amazonaws.com/menu/37e1669b-b7e6-4b5c-b0fb-530b67c1ff81-Ellipse%2016.png', 'https://lundry-app-admin.s3.ca-central-1.amazonaws.com/menu/37e1669b-b7e6-4b5c-b0fb-530b67c1ff81-Ellipse%2016.png', 'This is Shirt', 7.00, false, (select id from public.home_category hc where "name" = 'Self Service Laundry' and tenant = (Select id from tenant t where "name" = '${tenantName}')), (select id from backoffice_user bu where bu.username = '${shopAdmin}'), (select id from backoffice_user bu where bu.username = '${shopAdmin}'), 1, true);
 commit;
+
+
+CREATE TABLE public.customer (
+	id uuid DEFAULT gen_random_uuid() NOT NULL,
+	full_name text not NULL,
+	father_name text not NULL,
+	is_active bool DEFAULT true NOT NULL,
+	created_date timestamp DEFAULT now() NULL,
+	updated_date timestamp DEFAULT now() NULL,
+	gender text NULL,
+	id_no text not NULL,
+	issue_date timestamp not NULL,
+	expiry_date timestamp not NULL,
+	dob timestamp not NULL,
+	country text null,
+    state text null,
+    score text null,
+    response varchar,
+	address text null,
+    doc_front text null,
+    doc_back text null,
+	image text null,
+    status public."customer_status" NOT NULL,
+	is_deleted bool DEFAULT false NOT NULL,
+	created_by uuid NULL,
+	updated_by uuid NULL,
+	
+	CONSTRAINT customer_pk PRIMARY KEY (id),
+	CONSTRAINT customer_idno_status_uk UNIQUE  (id_no,status)
+	
+)
+
+CREATE TYPE public."customer_status" AS ENUM (
+	'verified',
+	'unverified');
