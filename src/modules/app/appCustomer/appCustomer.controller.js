@@ -8,10 +8,10 @@ const {
 const HTTP_STATUS = require('../../../utils/constants/httpStatus');
 
 const createCustomer = async (req, res) => {
- // delete req.body.doc_front
- delete req.body.image
- // delete req.body.tenant
- // console.log("customer--------- ", req.body);
+  // delete req.body.doc_front
+  // delete req.body.image
+  // delete req.body.tenant
+  // console.log("customer--------- ", req.body);
   logger.verbose(`Handling ${req.method} ${req.url} Route`);
   try {
     const data = await appCustomerService.createCustomer(req.body);
@@ -49,7 +49,6 @@ const createCustomer = async (req, res) => {
   }
 };
 
-
 module.exports = {
-  createCustomer
+  createCustomer,
 };

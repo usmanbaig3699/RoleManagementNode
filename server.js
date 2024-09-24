@@ -10,7 +10,6 @@ const fastifyFormBody = require('@fastify/formbody');
 const fastifyMultipart = require('@fastify/multipart');
 const path = require('path'); // configure path
 
-
 require('dotenv').config({
   path: path.join(__dirname, `.env.${process.env.NODE_ENV}`),
 }); // import Env File
@@ -67,7 +66,7 @@ server.register(fastifyMultipart, {
 // Swagger Implementation
 server.register(fastifySwagger, {});
 server.register(fastifySwaggerUI, {
-  routePrefix: '/docs',
+  routePrefix: '/kyc/docs',
   swagger: {
     info: {
       title: 'My FirstAPP Documentation',
@@ -109,10 +108,10 @@ server.register(fastifyCors, {
 });
 
 //  register all routes file with prefix
-server.register(routes, { prefix: process.env.WEB_SERVER_BASEPATH });
+server.register(routes, { prefix: `/kyc${process.env.WEB_SERVER_BASEPATH}` });
 
 // checking for server is up or not
-server.get('/', (req, res) =>
+server.get('/kyc', (req, res) =>
   res.code(200).send(apiSuccessResponse('Server is running now.'))
 );
 

@@ -13,9 +13,9 @@ const connection = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DATABASE,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  // ssl: {
+  //   rejectUnauthorized: true,
+  // },
   debug: true, // Enable debug mode to see SQL queries and connection info
 };
 if (!knexConnection) {
@@ -35,10 +35,13 @@ if (!knexConnection) {
   );
 }
 
-  // Test the connection
-  knexConnection.raw('SELECT 1').then(() => {
+// Test the connection
+knexConnection
+  .raw('SELECT 1')
+  .then(() => {
     logger.info('Successfully connected to Postgres database.');
-  }).catch(error => {
+  })
+  .catch((error) => {
     logger.error('Error during Postgres database connection:', error);
   });
 /*
