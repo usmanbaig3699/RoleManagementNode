@@ -144,9 +144,12 @@ const login = async (moduleName, protocol, headers, userData, logger) => {
       url.hostname.split('.')[process.env.HOST_SPLIT]
     );
 
-    console.log("systemConfig: ", url.hostname.split('.')[process.env.HOST_SPLIT])
-    console.log("url.hostname : ", url.hostname)
-    console.log("url : ", url)
+    console.log(
+      'systemConfig: ',
+      url.hostname.split('.')[process.env.HOST_SPLIT]
+    );
+    console.log('url.hostname : ', url.hostname);
+    console.log('url : ', url);
 
     if (!systemConfig) {
       result.hasError = true;
@@ -167,15 +170,16 @@ const login = async (moduleName, protocol, headers, userData, logger) => {
     if (tempUsers && tempUsers.length > 0) {
       const parentTenant = systemConfig.tenant;
       const tempUser = tempUsers[0];
-      console.log("tempUser: ",tempUsers[0])
+      console.log('tempUser: ', tempUsers[0]);
 
       const tenantQuery = await tenantModel.getTenantQuery(parentTenant);
 
-      console.log("tenantQuery: ",tenantQuery)
+      console.log('tenantQuery: ', tenantQuery);
 
-      const tenantExist = tenantQuery.find(
-        (item) => item.id === tempUser.tenant
-      );
+      // const tenantExist = tenantQuery.find(
+      //   (item) => item.id === tempUser.tenant
+      // );
+
       // if (!tenantExist) {
       //   result.hasError = true;
       //   result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
@@ -184,105 +188,110 @@ const login = async (moduleName, protocol, headers, userData, logger) => {
       //   return caseConversion.toCamelCase(result);
       // }
 
-     // if (!tempUser.is_super_admin) {
-        if (tempUser.is_deleted) {
-          result.hasError = true;
-          result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-          result.message = `Your account has been deleted.`;
-          logger.error(`${moduleName} user account is deleted.`);
-          return caseConversion.toCamelCase(result);
-        }
-        if (!tempUser.is_active) {
-          result.hasError = true;
-          result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-          result.message = `Your account has been deactivated.`;
-          logger.error(`${moduleName} user account is deactivated.`);
-          return caseConversion.toCamelCase(result);
-        }
-        if (tempUser.tenant) {
-          const findTenant = await tenantModel.findById(tempUser.tenant);
-          if (findTenant && findTenant.length > 0) {
-            if (findTenant[0].trial_start_date) {
-              const addTime = moment(findTenant[0].trial_start_date).add(
-                Number(findTenant[0].trial_mode_limit),
-                'days'
-              );
-              const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
-              if (currentDate > addTime) {
-                result.hasError = true;
-                result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-                result.message = `Your account has been expired.`;
-                logger.error(`${moduleName} user account is expired.`);
-                return caseConversion.toCamelCase(result);
-              }
+      // if (!tempUser.is_super_admin) {
+      if (tempUser.is_deleted) {
+        result.hasError = true;
+        result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        result.message = `Your account has been deleted.`;
+        logger.error(`${moduleName} user account is deleted.`);
+        return caseConversion.toCamelCase(result);
+      }
+      if (!tempUser.is_active) {
+        result.hasError = true;
+        result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        result.message = `Your account has been deactivated.`;
+        logger.error(`${moduleName} user account is deactivated.`);
+        return caseConversion.toCamelCase(result);
+      }
+      if (tempUser.tenant) {
+        const findTenant = await tenantModel.findById(tempUser.tenant);
+        if (findTenant && findTenant.length > 0) {
+          if (findTenant[0].trial_start_date) {
+            const addTime = moment(findTenant[0].trial_start_date).add(
+              Number(findTenant[0].trial_mode_limit),
+              'days'
+            );
+            const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+            if (currentDate > addTime) {
+              result.hasError = true;
+              result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+              result.message = `Your account has been expired.`;
+              logger.error(`${moduleName} user account is expired.`);
+              return caseConversion.toCamelCase(result);
             }
           }
         }
+      }
 
-        const passwordResult = await isVerifyAsync(
-          userData.password,
-          tempUser.password
-        );
-        // console.log('passwordResult:::::', passwordResult);
-        if (passwordResult) {
-          delete tempUser.password;
-          // in case of super admin this will null or theme can be defined for super admin user
-         // if (tempUser.tenant && !tempUser.is_super_admin) {
-          if (tempUser.tenant) {
-            const tenant = await tenantModel.findTenantByIdWithConfig(
-              tempUser.tenant
-            );
-            if (tenant) {
-              tempUser.tenant_config = tenant.tenant_config;
-              tempUser.tenant_name = tenant.name;
-              tempUser.employee_limit = tenant.user_limit;
-              tempUser.max_employee_limit = tenant.max_user_limit;
-              tempUser.branch_limit = tenant.max_branch_limit;
-              tempUser.trial_mode = tenant.trial_mode;
-              tempUser.trial_start_date = tenant.trial_start_date;
-              tempUser.trial_mode_limit = tenant.trial_mode_limit;
-            }
-           } 
-           // else {
-          //   result.hasError = true;
-          //   result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-          //   result.message = `Shop not found.`;
-          //   logger.error(`${moduleName} Shop not found.`);
-          // }
-          // Fetch and assign role & permissions
-          if (tempUser.role) {
-            const rolePermissions = await roleModel.findUserByIdWithPermissions(
-              tempUser.role
-            );
-            if (rolePermissions && rolePermissions.rows.length > 0) {
-              const [firstObject] = rolePermissions.rows;
-              tempUser.role = firstObject;
-            } else {
-              tempUser.role = [];
-            }
+      const passwordResult = await isVerifyAsync(
+        userData.password,
+        tempUser.password
+      );
+      // console.log('passwordResult:::::', passwordResult);
+      if (passwordResult) {
+        delete tempUser.password;
+        // in case of super admin this will null or theme can be defined for super admin user
+        // if (tempUser.tenant && !tempUser.is_super_admin) {
+        if (tempUser.tenant) {
+          const tenant = await tenantModel.findTenantByIdWithConfig(
+            tempUser.tenant
+          );
+          if (tenant) {
+            tempUser.tenant_config = tenant.tenant_config;
+            tempUser.tenant_name = tenant.name;
+            tempUser.employee_limit = tenant.user_limit;
+            tempUser.max_employee_limit = tenant.max_user_limit;
+            tempUser.branch_limit = tenant.max_branch_limit;
+            tempUser.trial_mode = tenant.trial_mode;
+            tempUser.trial_start_date = tenant.trial_start_date;
+            tempUser.trial_mode_limit = tenant.trial_mode_limit;
+          }
+        }
+        // else {
+        //   result.hasError = true;
+        //   result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        //   result.message = `Shop not found.`;
+        //   logger.error(`${moduleName} Shop not found.`);
+        // }
+        // Fetch and assign role & permissions
+        if (tempUser.role) {
+          const rolePermissions = await roleModel.findUserByIdWithPermissions(
+            tempUser.role
+          );
+          if (rolePermissions && rolePermissions.rows.length > 0) {
+            const [firstObject] = rolePermissions.rows;
+            tempUser.role = firstObject;
           } else {
             tempUser.role = [];
           }
-
-          // console.log('getTenantQuery:::::', getTenantQuery);
-          const [accessToken, refreshToken] = await getAuthTokensForAdmin(
-            { userId: tempUser.id, tenant: tempUser.tenant, isSuperAdmin: tempUser.is_super_admin, role: tempUser.role },
-            parentTenant
-          );
-       
-          tempUser.access_token = accessToken;
-          tempUser.refresh_token = refreshToken;
-        
-          result.user = tempUser;
-          result.message = `${moduleName} has been fetched successfully.`;
-          result.code = HTTP_STATUS.OK;
-        //  console.log("result--------------  ",result)
         } else {
-          result.hasError = true;
-          result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-          result.message = `There is an error in sign-in, please check the username and password.`;
-          logger.error(`${moduleName} invalid password.`);
+          tempUser.role = [];
         }
+
+        // console.log('getTenantQuery:::::', getTenantQuery);
+        const [accessToken, refreshToken] = await getAuthTokensForAdmin(
+          {
+            userId: tempUser.id,
+            tenant: tempUser.tenant,
+            isSuperAdmin: tempUser.is_super_admin,
+            role: tempUser.role,
+          },
+          parentTenant
+        );
+
+        tempUser.access_token = accessToken;
+        tempUser.refresh_token = refreshToken;
+
+        result.user = tempUser;
+        result.message = `${moduleName} has been fetched successfully.`;
+        result.code = HTTP_STATUS.OK;
+        //  console.log("result--------------  ",result)
+      } else {
+        result.hasError = true;
+        result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        result.message = `There is an error in sign-in, please check the username and password.`;
+        logger.error(`${moduleName} invalid password.`);
+      }
       // } else {
       //   result.hasError = true;
       //   result.code = HTTP_STATUS.INTERNAL_SERVER_ERROR;
@@ -739,8 +748,7 @@ const profile = async (moduleName, userId, logger) => {
 };
 
 const profileUpdate = async (moduleName, body, logger) => {
-
-  console.log("body--------------- ",body)
+  console.log('body--------------- ', body);
   let newBody = body;
   const file = newBody.avatar;
   delete newBody.avatar;
